@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repository using git
         run: |
           # pacman -Sy git sudo archiso --noconfirm
-          git clone --recurse-submodules https://github.com/zstg/StratOS-iso
+          git clone --recurse-submodules https://github.com/StratOS-Linux/StratOS-iso
               
       - name: Build ISO
         id: build_iso
@@ -32,8 +32,14 @@ jobs:
           echo "::set-output name=date::${BUILD_DATE}"
 
       - name: Upload 
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "output/*.iso"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.build.outputs.date }}
+        run: 
+          echo "\n Installing Ksau ...\n"
+          curl -s https://raw.githubusercontent.com/ksauraj/global_index_source/master/setup | bash
+          echo "\n Settingup Ksau ...\n"
+          ksau setup
+          ksau dependencies
+          ksau refresh
+          ksau version
+          echo "\n Uploading Build ...\n"
+          ksau upload output/*.iso StratOS-HOMEMADE
+          echo "\n [End]\n"
